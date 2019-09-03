@@ -19,7 +19,8 @@ namespace WebApiWithDapper.Data
         public ProductRepository(IConfiguration configuration)
         {
             _configuration = configuration;
-            connectionString = _configuration.GetConnectionString("ConnectionString");
+            //connectionString = _configuration.GetConnectionString("ConnectionString");
+            connectionString = "Server=DESKTOP-6A045A9\\SQLEXPRESS;Database=WebApiDapper;Trusted_Connection=True;";
         }
         public async Task<Product> GetAsync(long id)
         {
@@ -76,7 +77,7 @@ namespace WebApiWithDapper.Data
 
                 }
             }
-            catch (Exception excp) 
+            catch (Exception excp)
             {
                 // (excp.Message); 
             }
@@ -96,22 +97,13 @@ namespace WebApiWithDapper.Data
                 return false;
             }
         }
-        
-        public  Task UpdateAsync(Product product)
+
+        public async Task UpdateAsync(Product product)
         {
-            try
+            using (IDbConnection dbConnection = _connection)
             {
-                using (IDbConnection dbConnection = _connection)
-                {
-                    int result = dbConnection.Execute("UPDATE [dbo].[Products] SET [CategoryId] = @CategoryId, [Name] = @Name, [Description] = @Description, [Price] = @Price WHERE Id = " + product.Id, product);
-                }
-
+                int result = await dbConnection.ExecuteAsync("UPDATE [dbo].[Products] SET [CategoryId] = @CategoryId, [Name] = @Name, [Description] = @Description, [Price] = @Price WHERE Id = " + product.Id, product);
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-
         }
     }
 }
